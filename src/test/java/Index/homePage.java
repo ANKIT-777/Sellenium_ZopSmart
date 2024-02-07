@@ -1,13 +1,9 @@
 package Index;
-
-import org.checkerframework.checker.units.qual.N;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.annotations.BeforeTest;
@@ -16,11 +12,14 @@ import org.openqa.selenium.interactions.Actions;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import java.io.FileOutputStream;
-
-
 import java.io.IOException;
 import java.time.Duration;
 import java.util.List;
+
+import org.openqa.selenium.JavascriptExecutor;
+
+
+import static utills.BrowserSetup.getDriver;
 
 public class homePage {
 
@@ -40,30 +39,33 @@ public class homePage {
 
 
     @BeforeTest
-    public void setup() throws InterruptedException, IOException {
-
-        driver = new ChromeDriver();
-        System.setProperty("webdriver.chrome.driver","/Users/ankitsharma/Desktop/JAVA_Testing/Sellenium_ZopSmart/src/main/resources/chromedriver");
+    public void setup() {
+        String browser = "chrome";
+        driver = getDriver(browser);
         driver.manage().window().maximize();
         driver.get("https://www.urbanladder.com/");
 
     }
 
     @Test(priority = 1)
-    public void Homepage() throws InterruptedException, IOException {
+    public void Homepage() throws IOException, InterruptedException {
 
         Actions actions = new Actions(driver);
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
-        WebElement Living = driver.findElement(By.cssSelector("li.livingunit.topnav_item"));
+        WebElement Living = driver.findElement(
+                By.cssSelector("li.livingunit.topnav_item"));
+
         actions.moveToElement(Living).perform();
 
         wait.until(ExpectedConditions.visibilityOf(
-                driver.findElement(By.cssSelector("a.inverted[href=\"/coffee-table?src=g_topnav_living_tables_coffee-tables\"] span")
-                ))).click();
+                driver.findElement(
+                        By.cssSelector("a.inverted[href=\"/coffee-table?src=g_topnav_living_tables_coffee-tables\"] span"))))
+                .click();
 
-
-        WebElement closeButton = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("a.close-reveal-modal.hide-mobile")));
+        WebElement closeButton = wait.until(
+                ExpectedConditions.visibilityOfElementLocated(
+                        By.cssSelector("a.close-reveal-modal.hide-mobile")));
         closeButton.click();
 
         wait.until(ExpectedConditions.visibilityOfElementLocated(
@@ -81,18 +83,20 @@ public class homePage {
 
 
         NamesOfProducts = wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector("span.name")));
-        ActualPriceList = driver.findElements(By.cssSelector("div.price-number>span"));
-        putValueinExcel();
+        ActualPriceList = wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector("div.price-number>span")));
+        ValueForExcel();
 
         driver.quit();
+    }
+
+    private void waitForPageLoad(WebDriver driver) {
+        JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
+        jsExecutor.executeScript("return document.readyState").equals("complete");
 
     }
 
 
-
-
-
-    public void putValueinExcel() throws IOException {
+    public void ValueForExcel() throws IOException {
             Workbook workbook = new XSSFWorkbook();
             Sheet sheet = workbook.createSheet("Products");
 

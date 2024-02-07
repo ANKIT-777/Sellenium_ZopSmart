@@ -5,15 +5,19 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 
 public class BrowserSetup {
     public static WebDriver getDriver(String browser) throws IllegalArgumentException {
-        WebDriver driver;
+        WebDriver driver = null;
 
-        if (browser.equals("chrome")) {
-            System.setProperty("webdriver.chrome.driver", "/path/to/chromedriver");
-            driver = new ChromeDriver();
-        } else if (browser.equals("firefox"));{
-                System.setProperty("webdriver.gecko.driver", "/path/to/geckodriver");
+        switch (browser) {
+            case "chrome":
+                driver = new ChromeDriver();
+                break;
+            case "firefox":
                 driver = new FirefoxDriver();
+                break;
+            default:
+                System.out.println("Invalid browser choice.");
         }
+
         return driver;
     }
 
