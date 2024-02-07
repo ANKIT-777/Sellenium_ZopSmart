@@ -15,14 +15,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.List;
-import java.util.Scanner;
-
-
+import org.example.ConfigLoader;
 import static utills.BrowserSetup.getDriver;
 
 public class homePage {
-
     private WebDriver driver;
+    public ConfigLoader configure;
     List<WebElement> NamesOfProducts;
     List<WebElement> ActualPriceList;
     WebDriverWait wait;
@@ -42,13 +40,9 @@ public class homePage {
 
     @BeforeTest
     public void setup() {
-
-        System.out.println("Enter the browser name (chrome, firefox");
-        String browser = "chrome";
-
-        System.out.println("Enter the Excel file name: ");
-        excelFileName = "newfile";
-
+        configure = new ConfigLoader();
+        String browser = configure.getBrowser();
+        excelFileName = configure.getExcel();
         driver = getDriver(browser);
         driver.manage().window().maximize();
         driver.get("https://www.urbanladder.com/");
@@ -93,7 +87,6 @@ public class homePage {
         wait.until(ExpectedConditions.stalenessOf(productBox));
         NamesOfProducts = wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector("span.name")));
         ActualPriceList = driver.findElements(By.cssSelector("div.price-number > span"));
-
         ValueForExcel(NamesOfProducts, ActualPriceList);
     }
 
@@ -121,12 +114,10 @@ public class homePage {
                 priceCell.setCellValue(ActualPriceList.get(i).getText());
             }
 
-
             FileOutputStream outputStream = new FileOutputStream(excelFileName+".xlsx");
             workbook.write(outputStream);
             outputStream.close();
         }
-
 
         @AfterTest
         public void Close() {
