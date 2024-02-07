@@ -1,11 +1,11 @@
 package Index;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import com.beust.ah.A;
+import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
 import org.openqa.selenium.interactions.Actions;
@@ -15,8 +15,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.List;
-
-import org.openqa.selenium.JavascriptExecutor;
+import java.util.Scanner;
 
 
 import static utills.BrowserSetup.getDriver;
@@ -26,6 +25,7 @@ public class homePage {
     private WebDriver driver;
     List<WebElement> NamesOfProducts;
     List<WebElement> ActualPriceList;
+    WebDriverWait wait;
 
 
     @FindBy(css = "li.livingunit.topnav_item")
@@ -37,21 +37,29 @@ public class homePage {
     @FindBy(css = "div.gname:contains(\"Price\")")
     private WebElement priceButton;
 
+    private String excelFileName;
+
 
     @BeforeTest
     public void setup() {
+
+        System.out.println("Enter the browser name (chrome, firefox");
         String browser = "chrome";
+
+        System.out.println("Enter the Excel file name: ");
+        excelFileName = "newfile";
+
         driver = getDriver(browser);
         driver.manage().window().maximize();
         driver.get("https://www.urbanladder.com/");
-
     }
 
     @Test(priority = 1)
     public void Homepage() throws IOException, InterruptedException {
 
         Actions actions = new Actions(driver);
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        wait = new WebDriverWait(driver, Duration.ofSeconds(20));
+
 
         WebElement Living = driver.findElement(
                 By.cssSelector("li.livingunit.topnav_item"));
@@ -81,22 +89,17 @@ public class homePage {
         actions.dragAndDropBy(minHandle, 30, 0).perform();
         actions.dragAndDropBy(maxHandle, -30, 0).perform();
 
-
+        WebElement productBox = driver.findElement(By.cssSelector("div.productbox"));
+        wait.until(ExpectedConditions.stalenessOf(productBox));
         NamesOfProducts = wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector("span.name")));
-        ActualPriceList = wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector("div.price-number>span")));
-        ValueForExcel();
+        ActualPriceList = driver.findElements(By.cssSelector("div.price-number > span"));
 
-        driver.quit();
-    }
-
-    private void waitForPageLoad(WebDriver driver) {
-        JavascriptExecutor jsExecutor = (JavascriptExecutor) driver;
-        jsExecutor.executeScript("return document.readyState").equals("complete");
-
+        ValueForExcel(NamesOfProducts, ActualPriceList);
     }
 
 
-    public void ValueForExcel() throws IOException {
+    public void ValueForExcel(List<WebElement>namesOfProducts,List<WebElement>ActualPrice) throws IOException {
+
             Workbook workbook = new XSSFWorkbook();
             Sheet sheet = workbook.createSheet("Products");
 
@@ -118,10 +121,18 @@ public class homePage {
                 priceCell.setCellValue(ActualPriceList.get(i).getText());
             }
 
-            FileOutputStream outputStream = new FileOutputStream("Result.xlsx");
+
+            FileOutputStream outputStream = new FileOutputStream(excelFileName+".xlsx");
             workbook.write(outputStream);
             outputStream.close();
         }
+
+
+        @AfterTest
+        public void Close() {
+            driver.quit();
+        }
+
 
 
 }
