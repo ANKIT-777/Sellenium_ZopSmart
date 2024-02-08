@@ -1,5 +1,8 @@
 package Index;
 import com.beust.ah.A;
+import com.relevantcodes.extentreports.ExtentReports;
+import com.relevantcodes.extentreports.ExtentTest;
+import com.relevantcodes.extentreports.LogStatus;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.FindBy;
@@ -11,12 +14,20 @@ import org.testng.annotations.Test;
 import org.openqa.selenium.interactions.Actions;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.List;
 import org.example.ConfigLoader;
+
+import static org.openqa.selenium.devtools.v120.page.Page.captureScreenshot;
 import static utills.BrowserSetup.getDriver;
+import org.openqa.selenium.TakesScreenshot;
+import org.apache.commons.io.FileUtils;
+
+
 
 public class homePage {
     private WebDriver driver;
@@ -24,6 +35,10 @@ public class homePage {
     List<WebElement> NamesOfProducts;
     List<WebElement> ActualPriceList;
     WebDriverWait wait;
+
+    static ExtentReports reports;
+    static ExtentTest test;
+
 
 
     @FindBy(css = "li.livingunit.topnav_item")
@@ -39,13 +54,23 @@ public class homePage {
 
 
     @BeforeTest
-    public void setup() {
+    public void setup() throws IOException {
         configure = new ConfigLoader();
         String browser = configure.getBrowser();
         excelFileName = configure.getExcel();
         driver = getDriver(browser);
         driver.manage().window().maximize();
         driver.get("https://www.urbanladder.com/");
+        reports = new ExtentReports("/Users/ankitsharma/Desktop/JAVA_Testing/Sellenium_ZopSmart/src/main/Reports/report.html",true);
+                test = reports.startTest("Extent report Demo");
+                test.log(LogStatus.INFO,"Test Calss started");
+
+        String title = driver.getTitle();
+        System.err.println(title);
+                test.log(LogStatus.PASS,title);
+
+        test.log(LogStatus.PASS,test.addScreenCapture(captureScreen(driver)) + "Home page appreared");
+
     }
 
     @Test(priority = 1)
@@ -54,9 +79,9 @@ public class homePage {
         Actions actions = new Actions(driver);
         wait = new WebDriverWait(driver, Duration.ofSeconds(20));
 
-
         WebElement Living = driver.findElement(
                 By.cssSelector("li.livingunit.topnav_item"));
+
 
         actions.moveToElement(Living).perform();
 
@@ -83,16 +108,18 @@ public class homePage {
         actions.dragAndDropBy(minHandle, 30, 0).perform();
         actions.dragAndDropBy(maxHandle, -30, 0).perform();
 
+
         WebElement productBox = driver.findElement(By.cssSelector("div.productbox"));
         wait.until(ExpectedConditions.stalenessOf(productBox));
         NamesOfProducts = wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector("span.name")));
         ActualPriceList = driver.findElements(By.cssSelector("div.price-number > span"));
+
+        //loggin all the reports into Excel file
         ValueForExcel(NamesOfProducts, ActualPriceList);
     }
 
 
     public void ValueForExcel(List<WebElement>namesOfProducts,List<WebElement>ActualPrice) throws IOException {
-
             Workbook workbook = new XSSFWorkbook();
             Sheet sheet = workbook.createSheet("Products");
 
@@ -119,11 +146,24 @@ public class homePage {
             outputStream.close();
         }
 
+        public static String captureScreen(WebDriver driver) throws IOException {
+            File scrFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+            File destinationFile = new File("src/main/Reports/screenshots/" + System.currentTimeMillis() + ".png");
+
+            String absolutePath  = destinationFile.getAbsolutePath();
+
+            FileUtils.copyFile(scrFile,destinationFile);
+            return absolutePath;
+
+        }
+
         @AfterTest
         public void Close() {
             driver.quit();
-        }
+            reports.endTest(test);
+            reports.flush();
 
+        }
 
 
 }
