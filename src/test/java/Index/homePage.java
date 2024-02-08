@@ -89,6 +89,7 @@ public class homePage implements ITestListener {
         WebElement coffeeTableButton = driver.findElement(
                 By.cssSelector("a.inverted[href=\"/coffee-table?src=g_topnav_living_tables_coffee-tables\"] span"));
 
+            test = reports.startTest("Hom page Test");
             wait.until(ExpectedConditions.visibilityOf(coffeeTableButton)).click();
             test.log(LogStatus.WARNING,"redirecting to the cofee table page");
 
@@ -99,6 +100,8 @@ public class homePage implements ITestListener {
 
     @Test(priority = 2)
     public void priceFiltering() throws IOException {
+
+        test = reports.startTest("price page test");
         WebElement popupCloser = wait.until(ExpectedConditions.visibilityOfElementLocated(
                                 By.cssSelector("a.close-reveal-modal.hide-mobile")));
 
