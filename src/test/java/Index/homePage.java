@@ -8,6 +8,9 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.ITestListener;
+import org.testng.ITestResult;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
@@ -29,7 +32,7 @@ import org.apache.commons.io.FileUtils;
 
 
 
-public class homePage {
+public class homePage implements ITestListener {
     private WebDriver driver;
     public ConfigLoader configure;
     List<WebElement> NamesOfProducts;
@@ -70,8 +73,6 @@ public class homePage {
         System.err.println(title);
                 test.log(LogStatus.PASS,title);
 
-        test.log(LogStatus.PASS,test.addScreenCapture(captureScreen(driver)) + "Home page appreared");
-
     }
 
     @Test(priority = 1)
@@ -87,31 +88,25 @@ public class homePage {
 
         WebElement coffeeTableButton = driver.findElement(
                 By.cssSelector("a.inverted[href=\"/coffee-table?src=g_topnav_living_tables_coffee-tables\"] span"));
-        try {
+
+            test = reports.startTest("Hom page Test");
             wait.until(ExpectedConditions.visibilityOf(coffeeTableButton)).click();
             test.log(LogStatus.WARNING,"redirecting to the cofee table page");
-        }
-        catch (Exception e){
-            test.log(LogStatus.FAIL,"reson for failure in this test is" + e.getMessage());
-            test.log(LogStatus.PASS, test.addScreenCapture(captureScreen(driver)) +"coffee button visible");
-        }
+
+
+
 
     }
 
     @Test(priority = 2)
     public void priceFiltering() throws IOException {
+
+        test = reports.startTest("price page test");
         WebElement popupCloser = wait.until(ExpectedConditions.visibilityOfElementLocated(
                                 By.cssSelector("a.close-reveal-modal.hide-mobile")));
 
-        try {
-            popupCloser.click();
+        popupCloser.click();
             test.log(LogStatus.PASS,"Popup is gelling closed successfully");
-        }
-        catch (Exception e){
-            test.log(LogStatus.FAIL,"the pop up is not closing cause " + e.getMessage());
-            test.log(LogStatus.INFO, test.addScreenCapture(captureScreen(driver)) + "page is stuck here");
-        }
-
 
         WebElement priceBox = driver.findElement(By.cssSelector("li.item[data-group=\"price\"]"));
         wait.until(ExpectedConditions.visibilityOf(priceBox)).click();
@@ -174,7 +169,16 @@ public class homePage {
             return absolutePath;
         }
 
-        @AfterTest
+
+    @AfterMethod
+    public void afterMethod(ITestResult result) throws IOException {
+        if (result.getStatus() == ITestResult.FAILURE) {
+            test.log(LogStatus.FAIL, result.getThrowable());
+            test.log(LogStatus.FAIL, test.addScreenCapture(captureScreen(driver)));
+        }
+    }
+
+    @AfterTest
         public void Close() throws IOException {
             test.log(LogStatus.PASS, test.addScreenCapture(captureScreen(driver)) +"Test Has completed successfully");
             driver.quit();
