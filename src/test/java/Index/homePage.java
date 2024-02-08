@@ -87,10 +87,15 @@ public class homePage {
 
         WebElement coffeeTableButton = driver.findElement(
                 By.cssSelector("a.inverted[href=\"/coffee-table?src=g_topnav_living_tables_coffee-tables\"] span"));
+        try {
+            wait.until(ExpectedConditions.visibilityOf(coffeeTableButton)).click();
+            test.log(LogStatus.WARNING,"redirecting to the cofee table page");
+        }
+        catch (Exception e){
+            test.log(LogStatus.FAIL,"reson for failure in this test is" + e.getMessage());
+            test.log(LogStatus.PASS, test.addScreenCapture(captureScreen(driver)) +"coffee button visible");
+        }
 
-        wait.until(ExpectedConditions.visibilityOf(coffeeTableButton)).click();
-        test.log(LogStatus.WARNING,"redirecting to the new page");
-        test.log(LogStatus.PASS, test.addScreenCapture(captureScreen(driver)) +"coffee button visible");
     }
 
     @Test(priority = 2)
@@ -98,7 +103,15 @@ public class homePage {
         WebElement popupCloser = wait.until(ExpectedConditions.visibilityOfElementLocated(
                                 By.cssSelector("a.close-reveal-modal.hide-mobile")));
 
-        popupCloser.click();
+        try {
+            popupCloser.click();
+            test.log(LogStatus.PASS,"Popup is gelling closed successfully");
+        }
+        catch (Exception e){
+            test.log(LogStatus.FAIL,"the pop up is not closing cause " + e.getMessage());
+            test.log(LogStatus.INFO, test.addScreenCapture(captureScreen(driver)) + "page is stuck here");
+        }
+
 
         WebElement priceBox = driver.findElement(By.cssSelector("li.item[data-group=\"price\"]"));
         wait.until(ExpectedConditions.visibilityOf(priceBox)).click();
@@ -110,9 +123,13 @@ public class homePage {
         actions.dragAndDropBy(minHandle, 30, 0).perform();
         actions.dragAndDropBy(maxHandle, -30, 0).perform();
 
+        test.log(LogStatus.PASS,test.addScreenCapture(captureScreen(driver)) + "slider is moving perfectly");
+
+
 
         WebElement productBox = driver.findElement(By.cssSelector("div.productbox"));
         wait.until(ExpectedConditions.stalenessOf(productBox));
+
 
         NamesOfProducts = wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector("span.name")));
         ActualPriceList = driver.findElements(By.cssSelector("div.price-number > span"));
@@ -158,11 +175,11 @@ public class homePage {
         }
 
         @AfterTest
-        public void Close() {
+        public void Close() throws IOException {
+            test.log(LogStatus.PASS, test.addScreenCapture(captureScreen(driver)) +"Test Has completed successfully");
             driver.quit();
             reports.endTest(test);
             reports.flush();
-
         }
 
 
