@@ -8,6 +8,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.Assert;
 import org.testng.ITestListener;
 import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
@@ -65,12 +66,12 @@ public class homePage implements ITestListener {
         driver = getDriver(browser);
         driver.manage().window().maximize();
         driver.get("https://www.urbanladder.com/");
+
         reports = new ExtentReports("/Users/ankitsharma/Desktop/JAVA_Testing/Sellenium_ZopSmart/src/main/Reports/report.html",true);
                 test = reports.startTest("Extent report Demo");
                 test.log(LogStatus.INFO,"Test Calss started");
 
         String title = driver.getTitle();
-        System.err.println(title);
                 test.log(LogStatus.PASS,title);
 
     }
@@ -83,30 +84,21 @@ public class homePage implements ITestListener {
 
         WebElement Living = driver.findElement(By.cssSelector("li.livingunit.topnav_item"));
         actions.moveToElement(Living).perform();
-        test.log(LogStatus.INFO,driver.getTitle());
-        test.log(LogStatus.PASS, test.addScreenCapture(captureScreen(driver)) +"Living button visible");
+            test.log(LogStatus.INFO,driver.getTitle());
 
-        WebElement coffeeTableButton = driver.findElement(
-                By.cssSelector("a.inverted[href=\"/coffee-table?src=g_topnav_living_tables_coffee-tables\"] span"));
-
-            test = reports.startTest("Hom page Test");
-            wait.until(ExpectedConditions.visibilityOf(coffeeTableButton)).click();
-            test.log(LogStatus.WARNING,"redirecting to the cofee table page");
-
-
-
-
+        WebElement coffeeTableButton = driver.findElement(By.cssSelector("a.inverted[href=\"/coffee-table?src=g_topnav_living_tables_coffee-tables\"] span"));
+        wait.until(ExpectedConditions.visibilityOf(coffeeTableButton)).click();
     }
 
     @Test(priority = 2)
     public void priceFiltering() throws IOException {
 
-        test = reports.startTest("price page test");
-        WebElement popupCloser = wait.until(ExpectedConditions.visibilityOfElementLocated(
-                                By.cssSelector("a.close-reveal-modal.hide-mobile")));
+                test = reports.startTest("price page test");
+        WebElement popupCloser = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("a.close-reveal-modal.hide-mobile")));
+        Assert.assertTrue(popupCloser.isDisplayed());
 
         popupCloser.click();
-            test.log(LogStatus.PASS,"Popup is gelling closed successfully");
+                test.log(LogStatus.PASS,"Popup is gelling closed successfully");
 
         WebElement priceBox = driver.findElement(By.cssSelector("li.item[data-group=\"price\"]"));
         wait.until(ExpectedConditions.visibilityOf(priceBox)).click();
@@ -118,16 +110,16 @@ public class homePage implements ITestListener {
         actions.dragAndDropBy(minHandle, 30, 0).perform();
         actions.dragAndDropBy(maxHandle, -30, 0).perform();
 
-        test.log(LogStatus.PASS,test.addScreenCapture(captureScreen(driver)) + "slider is moving perfectly");
-
-
-
         WebElement productBox = driver.findElement(By.cssSelector("div.productbox"));
         wait.until(ExpectedConditions.stalenessOf(productBox));
 
 
         NamesOfProducts = wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector("span.name")));
         ActualPriceList = driver.findElements(By.cssSelector("div.price-number > span"));
+
+        Assert.assertFalse(NamesOfProducts.isEmpty());
+        Assert.assertFalse(ActualPriceList.isEmpty());
+
         ValueForExcel(NamesOfProducts, ActualPriceList);
     }
 
@@ -162,7 +154,6 @@ public class homePage implements ITestListener {
         public static String captureScreen(WebDriver driver) throws IOException {
             File scrFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
             File destinationFile = new File("src/main/Reports/screenshots/" + System.currentTimeMillis() + ".png");
-
             String absolutePath  = destinationFile.getAbsolutePath();
 
             FileUtils.copyFile(scrFile,destinationFile);
@@ -185,8 +176,6 @@ public class homePage implements ITestListener {
             reports.endTest(test);
             reports.flush();
         }
-
-
 }
 
 
