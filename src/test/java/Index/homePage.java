@@ -51,6 +51,7 @@ public class homePage {
     private WebElement priceButton;
 
     private String excelFileName;
+    private Actions actions;
 
 
     @BeforeTest
@@ -76,30 +77,31 @@ public class homePage {
     @Test(priority = 1)
     public void Homepage() throws IOException, InterruptedException {
 
-        Actions actions = new Actions(driver);
+        actions = new Actions(driver);
         wait = new WebDriverWait(driver, Duration.ofSeconds(20));
 
-        WebElement Living = driver.findElement(
-                By.cssSelector("li.livingunit.topnav_item"));
-
-
+        WebElement Living = driver.findElement(By.cssSelector("li.livingunit.topnav_item"));
         actions.moveToElement(Living).perform();
+        test.log(LogStatus.INFO,driver.getTitle());
+        test.log(LogStatus.PASS, test.addScreenCapture(captureScreen(driver)) +"Living button visible");
 
-        wait.until(ExpectedConditions.visibilityOf(
-                driver.findElement(
-                        By.cssSelector("a.inverted[href=\"/coffee-table?src=g_topnav_living_tables_coffee-tables\"] span"))))
-                .click();
+        WebElement coffeeTableButton = driver.findElement(
+                By.cssSelector("a.inverted[href=\"/coffee-table?src=g_topnav_living_tables_coffee-tables\"] span"));
 
-        WebElement closeButton = wait.until(
-                ExpectedConditions.visibilityOfElementLocated(
-                        By.cssSelector("a.close-reveal-modal.hide-mobile")));
-        closeButton.click();
+        wait.until(ExpectedConditions.visibilityOf(coffeeTableButton)).click();
+        test.log(LogStatus.WARNING,"redirecting to the new page");
+        test.log(LogStatus.PASS, test.addScreenCapture(captureScreen(driver)) +"coffee button visible");
+    }
 
-        wait.until(ExpectedConditions.visibilityOfElementLocated(
-                        By.cssSelector("li.item[data-group=\"price\"]"))).
-                click();
+    @Test(priority = 2)
+    public void priceFiltering() throws IOException {
+        WebElement popupCloser = wait.until(ExpectedConditions.visibilityOfElementLocated(
+                                By.cssSelector("a.close-reveal-modal.hide-mobile")));
 
+        popupCloser.click();
 
+        WebElement priceBox = driver.findElement(By.cssSelector("li.item[data-group=\"price\"]"));
+        wait.until(ExpectedConditions.visibilityOf(priceBox)).click();
 
         WebElement slider = driver.findElement(By.cssSelector("div.range-slider"));
         WebElement minHandle = slider.findElement(By.className("noUi-handle-lower"));
@@ -111,10 +113,9 @@ public class homePage {
 
         WebElement productBox = driver.findElement(By.cssSelector("div.productbox"));
         wait.until(ExpectedConditions.stalenessOf(productBox));
+
         NamesOfProducts = wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector("span.name")));
         ActualPriceList = driver.findElements(By.cssSelector("div.price-number > span"));
-
-        //loggin all the reports into Excel file
         ValueForExcel(NamesOfProducts, ActualPriceList);
     }
 
@@ -154,7 +155,6 @@ public class homePage {
 
             FileUtils.copyFile(scrFile,destinationFile);
             return absolutePath;
-
         }
 
         @AfterTest
