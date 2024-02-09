@@ -36,5 +36,5 @@ jobs:
       - run: chrome --version
 
       - name: Run Selenium tests
-        run: mvn clean test
+        run: mvn test
 
