@@ -73,7 +73,6 @@ public class TestHomePage implements ITestListener {
 
         String title = driver.getTitle();
         test.log(LogStatus.PASS,title);
-
     }
 
 
@@ -111,10 +110,10 @@ public class TestHomePage implements ITestListener {
         WebElement maxHandle = slider.findElement(By.className("noUi-handle-upper"));
 
         actions.dragAndDropBy(minHandle, 30, 0).perform();
-//        actions.dragAndDropBy(maxHandle, -30, 0).perform();
+        actions.dragAndDropBy(maxHandle, -30, 0).perform();
 
-//        WebElement productBox = driver.findElement(By.cssSelector("div.productbox"));
-//        wait.until(ExpectedConditions.stalenessOf(productBox));
+        WebElement productBox = driver.findElement(By.cssSelector("div.productbox"));
+        wait.until(ExpectedConditions.stalenessOf(productBox));
 
 
         NamesOfProducts = wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector("span.name")));
