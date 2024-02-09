@@ -3,6 +3,7 @@ import com.relevantcodes.extentreports.ExtentReports;
 import com.relevantcodes.extentreports.ExtentTest;
 import com.relevantcodes.extentreports.LogStatus;
 import org.openqa.selenium.*;
+import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -62,6 +63,7 @@ public class TestHomePage implements ITestListener {
         excelFileName = configure.getExcel();
 
         driver = getDriver(browser);
+
         driver.manage().window().maximize();
         driver.get("https://www.urbanladder.com/");
 
