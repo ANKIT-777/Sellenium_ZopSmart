@@ -60,9 +60,10 @@ public class TestHomePage implements ITestListener {
     public void setup() throws IOException {
         configure = new ConfigLoader();
         String browser = configure.getBrowser();
-        excelFileName = configure.getExcel();
 
-        driver = getDriver(browser);
+
+        driver = new ChromeDriver();
+        excelFileName = "newExcel";
 
         driver.manage().window().maximize();
         driver.get("https://www.urbanladder.com/");
