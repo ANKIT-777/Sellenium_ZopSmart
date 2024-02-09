@@ -1,6 +1,7 @@
 package utills;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 
 public class BrowserSetup {
@@ -14,6 +15,10 @@ public class BrowserSetup {
             case "firefox":
                 driver = new FirefoxDriver();
                 break;
+            case "headless":
+                ChromeOptions options = new ChromeOptions();
+                options.addArguments("--headless");
+                driver = new ChromeDriver(options);
             default:
                 System.out.println("Invalid browser choice.");
         }

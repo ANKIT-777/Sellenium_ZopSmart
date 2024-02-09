@@ -1,10 +1,8 @@
 package Index;
-import com.beust.ah.A;
 import com.relevantcodes.extentreports.ExtentReports;
 import com.relevantcodes.extentreports.ExtentTest;
 import com.relevantcodes.extentreports.LogStatus;
 import org.openqa.selenium.*;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -26,14 +24,13 @@ import java.time.Duration;
 import java.util.List;
 import org.example.ConfigLoader;
 
-import static org.openqa.selenium.devtools.v120.page.Page.captureScreenshot;
 import static utills.BrowserSetup.getDriver;
 import org.openqa.selenium.TakesScreenshot;
 import org.apache.commons.io.FileUtils;
 
 
 
-public class homePage implements ITestListener {
+public class testHomePage implements ITestListener {
     private WebDriver driver;
     public ConfigLoader configure;
     List<WebElement> NamesOfProducts;
@@ -63,18 +60,22 @@ public class homePage implements ITestListener {
         configure = new ConfigLoader();
         String browser = configure.getBrowser();
         excelFileName = configure.getExcel();
+
         driver = getDriver(browser);
         driver.manage().window().maximize();
         driver.get("https://www.urbanladder.com/");
 
         reports = new ExtentReports("/Users/ankitsharma/Desktop/JAVA_Testing/Sellenium_ZopSmart/src/main/Reports/report.html",true);
-                test = reports.startTest("Extent report Demo");
-                test.log(LogStatus.INFO,"Test Calss started");
+        test = reports.startTest("Extent report Demo");
+        test.log(LogStatus.INFO,"Test Calss started");
 
         String title = driver.getTitle();
-                test.log(LogStatus.PASS,title);
+        test.log(LogStatus.PASS,title);
 
     }
+
+
+
 
     @Test(priority = 1)
     public void Homepage() throws IOException, InterruptedException {
@@ -108,10 +109,10 @@ public class homePage implements ITestListener {
         WebElement maxHandle = slider.findElement(By.className("noUi-handle-upper"));
 
         actions.dragAndDropBy(minHandle, 30, 0).perform();
-        actions.dragAndDropBy(maxHandle, -30, 0).perform();
+//        actions.dragAndDropBy(maxHandle, -30, 0).perform();
 
-        WebElement productBox = driver.findElement(By.cssSelector("div.productbox"));
-        wait.until(ExpectedConditions.stalenessOf(productBox));
+//        WebElement productBox = driver.findElement(By.cssSelector("div.productbox"));
+//        wait.until(ExpectedConditions.stalenessOf(productBox));
 
 
         NamesOfProducts = wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector("span.name")));
@@ -146,7 +147,7 @@ public class homePage implements ITestListener {
                 priceCell.setCellValue(ActualPriceList.get(i).getText());
             }
 
-            FileOutputStream outputStream = new FileOutputStream(excelFileName+".xlsx");
+            FileOutputStream outputStream = new FileOutputStream(excelFileName+ System.currentTimeMillis()  +".xlsx");
             workbook.write(outputStream);
             outputStream.close();
         }
