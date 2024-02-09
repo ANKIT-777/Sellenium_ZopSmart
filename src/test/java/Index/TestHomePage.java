@@ -30,7 +30,7 @@ import org.apache.commons.io.FileUtils;
 
 
 
-public class testHomePage implements ITestListener {
+public class TestHomePage implements ITestListener {
     private WebDriver driver;
     public ConfigLoader configure;
     List<WebElement> NamesOfProducts;
