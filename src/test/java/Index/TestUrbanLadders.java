@@ -23,7 +23,7 @@ import utills.TestListener;
 
 @Listeners(TestListener.class)
 public class TestUrbanLadders {
-    WebDriver driver;
+    public static WebDriver driver;
     private ConfigLoader configLoader;
     WebDriverWait wait;
     List<WebElement> filteredNames;
@@ -39,9 +39,7 @@ public class TestUrbanLadders {
         driver.manage().window().maximize();
         driver.get("https://www.urbanladder.com/");
         wait = new WebDriverWait(driver, Duration.ofSeconds(20));
-        TestListener testListener = new TestListener(driver);
-        reports = new ExtentReports("/Users/ankitsharma/Desktop/JAVA_Testing/Sellenium_ZopSmart/src/main/Reports/report.html", true);
-
+        reports = new ExtentReports("/Users/ankitsharma/Desktop/JAVA_Testing/Sellenium_ZopSmart/src/main/Reports/report2.html", true);
     }
 
 
@@ -57,7 +55,7 @@ public class TestUrbanLadders {
     public void priceFiltering(){
         PriceFiltering priceFiltering = new PriceFiltering(driver);
         priceFiltering.priceButton();
-        priceFiltering.testpriceFiltering();
+        priceFiltering.testpriceFiltering(30, 40);
         filteredNames =  priceFiltering.getFilteredProducts(wait);
         filteredPrices = priceFiltering.getFilteredProductsPrices(wait);
 

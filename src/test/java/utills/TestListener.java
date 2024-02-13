@@ -1,5 +1,6 @@
 package utills;
 
+import Index.TestUrbanLadders;
 import com.relevantcodes.extentreports.ExtentReports;
 import com.relevantcodes.extentreports.ExtentTest;
 import com.relevantcodes.extentreports.LogStatus;
@@ -21,25 +22,25 @@ import java.io.IOException;
 public class TestListener implements ITestListener {
     static ExtentReports reports;
     static ExtentTest test;
-    private WebDriver driver;
+    public WebDriver driver;
+
 
     public TestListener() {
 
     }
+
     public TestListener(WebDriver driver){
-        if (driver == null) {
-            throw new IllegalArgumentException("WebDriver cannot be null");
-        }
-        this.driver = driver;
-        PageFactory.initElements(driver, this);
+        this.driver =driver;
+        PageFactory.initElements(driver,this);
     }
+
     public void onTestFailure(ITestResult result) {
         if (result.getStatus() == ITestResult.FAILURE) {
             reports = new ExtentReports("/Users/ankitsharma/Desktop/JAVA_Testing/Sellenium_ZopSmart/src/main/Reports/report.html",true);
             test = reports.startTest(result.getMethod().getMethodName());
             test.log(LogStatus.FAIL, result.getThrowable());
             try {
-                test.log(LogStatus.FAIL, test.addScreenCapture(captureScreen(driver)));
+                test.log(LogStatus.FAIL, test.addScreenCapture(captureScreen()));
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -49,8 +50,8 @@ public class TestListener implements ITestListener {
         }
     }
 
-    public String captureScreen(WebDriver driver) throws IOException {
-        File scrFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+    public String captureScreen() throws IOException {
+        File scrFile = ((TakesScreenshot) TestUrbanLadders.driver).getScreenshotAs(OutputType.FILE);
         File destinationFile = new File("src/main/Reports/screenshots/" + System.currentTimeMillis() + ".png");
         String absolutePath  = destinationFile.getAbsolutePath();
         FileUtils.copyFile(scrFile,destinationFile);

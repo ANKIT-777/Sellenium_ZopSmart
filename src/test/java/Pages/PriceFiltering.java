@@ -37,17 +37,19 @@ public class PriceFiltering {
     public void priceButton(){
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         wait.until(ExpectedConditions.visibilityOf(PopUpCloser));
+        PopUpCloser.click();
 
     }
 
-    public void testpriceFiltering(){
+    public void testpriceFiltering(int leftval ,int rightval){
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         wait.until(ExpectedConditions.visibilityOf(priceButton));
         priceButton.click();
         WebElement slider = driver.findElement(By.cssSelector("div.range-slider"));
         WebElement minHandle = slider.findElement(By.className("noUi-handle-lower"));
         WebElement maxHandle = slider.findElement(By.className("noUi-handle-upper"));
-        actions.dragAndDropBy(minHandle,30,0).perform();
+        actions.dragAndDropBy(minHandle,leftval,0).perform();
+        actions.dragAndDropBy(minHandle,-rightval,0).perform();
 
         WebElement productBox = driver.findElement(By.cssSelector("div.productbox"));
         wait.until(ExpectedConditions.stalenessOf(productBox));
