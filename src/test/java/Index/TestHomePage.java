@@ -49,6 +49,7 @@ public class TestHomePage implements ITestListener {
     @FindBy(css = "a[href=\"/coffee-table?src=g_topnav_living_tables_coffee-tables\"] > span" )
     private WebElement coffeeButton;
 
+
     @FindBy(css = "div.gname:contains(\"Price\")")
     private WebElement priceButton;
 
